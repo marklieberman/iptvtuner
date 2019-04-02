@@ -49,7 +49,7 @@ namespace IPTVTuner
 
                     // Read all values that provide default values.
                     this.ipAddress = (string)reg.GetValue("IpAddress", "127.0.0.1");
-                    this.port = (int)reg.GetValue("Port", 6709);
+                    this.port = (int)reg.GetValue("Port", 6079);
                     this.startChannel = (int)reg.GetValue("StartChannel", 1);
                     this.filter = (string)reg.GetValue("Filter", ".*");
                 }
