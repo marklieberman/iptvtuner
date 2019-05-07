@@ -9,5 +9,10 @@ namespace IPTVTuner
         {
             InitializeComponent();
         }
+
+        private void ServiceProcessInstaller1_AfterInstall(object sender, System.Configuration.Install.InstallEventArgs e)
+        {
+
+        }
     }
 }
