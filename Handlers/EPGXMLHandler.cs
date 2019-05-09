@@ -20,7 +20,7 @@ namespace IPTVTuner.Handlers
         public Task Handle(IHttpContext context, Func<Task> next)
         {
             context.Response = XMLResponse(context, File.OpenRead(Path.Combine(config.DataPath, "epg.xml")));
-            
+
             return Task.Factory.GetCompleted();
         }
     }

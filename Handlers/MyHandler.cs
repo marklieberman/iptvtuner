@@ -20,33 +20,47 @@ namespace IPTVTuner.Handlers
 
         protected IHttpResponse Found(string url)
         {
-            return StringHttpResponse.Create(string.Empty, HttpResponseCode.Found, null, false, new ListHttpHeaders(new[] {
+            var headers = new ListHttpHeaders(new[] {
                 new KeyValuePair<string, string>("Location", url)
-            }));
+            });
+
+            return StringHttpResponse.Create(string.Empty, HttpResponseCode.Found, null, false, headers);
         }
 
         protected HttpResponse JsonResponse(IHttpContext context, object value)
         {
+            var headers = new ListHttpHeaders(new[] {
+                new KeyValuePair<string, string>("Cache-Control", "no-store")
+            });
+
             var serializer = new JsonSerializer();
-            var memoryStream = new MemoryStream();
-            var streamWriter = new StreamWriter(memoryStream);
+            var stream = new MemoryStream();
+            var streamWriter = new StreamWriter(stream);
 
             serializer.Serialize(streamWriter, value);
 
             streamWriter.Flush();
-            memoryStream.Position = 0;
+            stream.Position = 0;
 
-            return new HttpResponse(HttpResponseCode.Ok, "application/json; charset-utf-8", memoryStream, false);
+            return new HttpResponse(HttpResponseCode.Ok, "application/json; charset-utf-8", stream, false, headers);
         }
 
         protected HttpResponse JsonResponse(IHttpContext context, FileStream stream)
         {
-            return new HttpResponse(HttpResponseCode.Ok, "application/json; charset-utf-8", stream, false);
+            var headers = new ListHttpHeaders(new[] {
+                new KeyValuePair<string, string>("Cache-Control", "no-store")
+            });
+
+            return new HttpResponse(HttpResponseCode.Ok, "application/json; charset-utf-8", stream, false, headers);
         }
 
         protected HttpResponse XMLResponse(IHttpContext context, FileStream stream)
         {
-            return new HttpResponse(HttpResponseCode.Ok, "application/xml; charset-utf-8", stream, false);
+            var headers = new ListHttpHeaders(new[] {
+                new KeyValuePair<string, string>("Cache-Control", "no-store")
+            });
+
+            return new HttpResponse(HttpResponseCode.Ok, "application/xml; charset-utf-8", stream, false, headers);
         }
     }
 }
