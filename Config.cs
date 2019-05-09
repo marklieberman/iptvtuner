@@ -12,9 +12,9 @@ namespace IPTVTuner
         private int port;
         private int startChannel;
         private string filter;
-
         private string m3uUrl;
         private string epgUrl;
+        private bool gapFill;
         
         public Config(EventLog eventLog) {
             this.eventLog = eventLog;
@@ -52,6 +52,8 @@ namespace IPTVTuner
                     this.port = (int)reg.GetValue("Port", 6079);
                     this.startChannel = (int)reg.GetValue("StartChannel", 1);
                     this.filter = (string)reg.GetValue("Filter", ".*");
+                    this.gapFill = (int)reg.GetValue("GapFill", 0) > 0;
+
                 }
             }
         }
@@ -94,6 +96,11 @@ namespace IPTVTuner
         public int MaxChannels
         {
             get { return 420; }
+        }
+
+        public bool GapFill
+        {
+            get { return gapFill; }
         }
 
         /**
