@@ -41,6 +41,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -55,6 +56,7 @@
     <Compile Include="EPGBuilder.cs" />
     <Compile Include="Handlers\DiscoveryHandler.cs" />
     <Compile Include="Handlers\EPGXMLHandler.cs" />
+    <Compile Include="Handlers\EPGLogoHandler.cs" />
     <Compile Include="Handlers\UpdateHandler.cs" />
     <Compile Include="Handlers\ServeHandler.cs" />
     <Compile Include="Handlers\LineupHandler.cs" />

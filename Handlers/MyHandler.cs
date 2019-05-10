@@ -27,6 +27,15 @@ namespace IPTVTuner.Handlers
             return StringHttpResponse.Create(string.Empty, HttpResponseCode.Found, null, false, headers);
         }
 
+        protected HttpResponse StreamResponse(IHttpContext context, string contentType, Stream stream)
+        {
+            var headers = new ListHttpHeaders(new[] {
+                new KeyValuePair<string, string>("Cache-Control", "no-store")
+            });
+
+            return new HttpResponse(HttpResponseCode.Ok, contentType, stream, false, headers);
+        }
+
         protected HttpResponse JsonResponse(IHttpContext context, object value)
         {
             var headers = new ListHttpHeaders(new[] {

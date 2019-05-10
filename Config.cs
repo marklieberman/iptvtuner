@@ -15,7 +15,10 @@ namespace IPTVTuner
         private string m3uUrl;
         private string epgUrl;
         private bool gapFill;
-        
+        private string logoFontFamily;
+        private uint logoColor;
+        private uint logoBackground;
+
         public Config(EventLog eventLog) {
             this.eventLog = eventLog;
             Read();
@@ -53,7 +56,9 @@ namespace IPTVTuner
                     this.startChannel = (int)reg.GetValue("StartChannel", 1);
                     this.filter = (string)reg.GetValue("Filter", ".*");
                     this.gapFill = (int)reg.GetValue("GapFill", 0) > 0;
-
+                    this.logoFontFamily = (string)reg.GetValue("LogoFontFamily", "Segoe UI");
+                    this.logoColor = (uint)reg.GetValue("LogoColor", 0xFFDCDCDC);
+                    this.logoBackground = (uint)reg.GetValue("LogoBackground", (uint)1);
                 }
             }
         }
@@ -101,6 +106,21 @@ namespace IPTVTuner
         public bool GapFill
         {
             get { return gapFill; }
+        }
+
+        public string LogoFontFamily
+        {
+            get { return logoFontFamily; }
+        }
+
+        public uint LogoColor
+        {
+            get { return logoColor; }
+        }
+
+        public uint LogoBackground
+        {
+            get { return logoBackground; }
         }
 
         /**

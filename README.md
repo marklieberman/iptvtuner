@@ -2,15 +2,15 @@
 
 Emulates a network tuner to allow IPTV streams to play in Plex.
 
-This is a very lightweight Windows service that is similar in function to [telly 1.1](https://github.com/tellytv/telly). It has been tested on Windows 10 and Windows Server Core 2016. 
+This is a very lightweight Windows service that is similar in function to [telly 1.1](https://github.com/tellytv/telly). It has been tested on Windows 10 and Windows Server Core 2016.
 
 ## Install
 
 1. Copy IPTVTuner.exe and related DLLs to the server.
 2. Ensure that "NT AUTHORITY\LocalService" has read and execute access to IPTVTuner.exe, related DLLs, and the directory.
 
-Example of changing ACLs in PowerShell.
-```powershell
+    Example of changing ACLs in PowerShell.
+    ```powershell
 $acl = Get-Acl .\IPTVTuner.exe
 $AccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("NT AUTHORITY\LocalService","ReadAndExecute","Allow")
 $acl.SetAccessRule($AccessRule)
@@ -20,33 +20,55 @@ $acl | Set-Acl .\uhttpsharp.dll
 ```
 
 3. Using an admin console, register the IPTVTuner service.
-```cmd
+    ```cmd
 IPTVTuner.exe --install
 ```
-You can remove the service with the `--uninstall` argument.
+    You can remove the service with the `--uninstall` argument.
 
-3. Configure the M3U/EPG URL and filters in the registry.
+3. Configure the M3U URL, EPG URL and Filter in the registry.
 
-The following are required:
-```cmd
+    ```cmd
 REG ADD HKLM\Software\IPTVTuner /v M3UURL /t REG_SZ /d "http://provider.com/get.php..."
 REG ADD HKLM\Software\IPTVTuner /v EPGURL /t REG_SZ /d "http://provider.com/xmltv.php..."
 REG ADD HKLM\Software\IPTVTuner /v Filter /t REG_SZ /d "ENGLISH$"
 ```
 
-The following are optional entries; default values are shown:
-```cmd
-REG ADD HKLM\Software\IPTVTuner /v IpAddress /t REG_SZ /d "127.0.0.1"
-REG ADD HKLM\Software\IPTVTuner /v Port /t REG_DWORD /d 6079
-REG ADD HKLM\Software\IPTVTuner /v StartChannel /t REG_DWORD /d 1
-```
+   You may also configure additional settings like bind IP address, port, starting channel number, etc. See the Registry Settings section below.
 
-4. Start the service with `net start IPTVTuner`. If everything is configured correctly, the Application event log should report that IPTVTuner has begun updating the lineup and EPG.
+4. Start the service with `net start IPTVTuner`. If everything is configured correctly, the Application event log should report that IPTVTuner has begun updating the lineup and EPG. If you get "access denied," ensure you have completed step 2.
 
-## Update EPG
+### Update EPG
 
-Create a scheduled task to periodically update the EPG. The scheduled task should invoke `IPTVTuner.exe --update-epg`. This will regenerate the local epg.xml so that Plex can update its guide.
+Create a scheduled task using Windows' Task Scheduler to periodically update the EPG. The scheduled task should invoke `IPTVTuner.exe --update-epg`. This will regenerate the local epg.xml so that Plex can update its guide. I recommend scheduling this to run 15 minutes before the "Scheduled Tasks" window (2am - 5am by default) in Plex.
 
+## Settings
+
+Settings for IPTVTuner are stored in the Windows Registry under HKLM\Software\IPTVTuner. You must create this key if it does not exist. (See step 3 of the Install section.)
+
+| Key | Type | Description | Default Value |
+| --  | --   | --          | --      | -- |
+| M3UURL | REG_SZ | URL of the M3U from your provider | **Required** |
+| EPGURL | REG_SZ | URL of the EPG from your provider | **Required** |
+| Filter | REG_SZ | Regular expression to include channels | **Required** |
+| IpAddress | REG_SZ | IP address on which to listen | 127.0.0.1 |
+| Port | REG_SZ | Port number on which to listen | 6079 |
+| StartChannel | REG_DWORD | Starting channel number for IPTV lineup | 1 |
+
+### Additional Registry Settings
+
+#### Channel Logo
+
+IPTVTuner uses the logo URL in your provider's XML for each channel. If no URL is provided, IPTVTuner will generate a basic logo image using the channel name. Some Plex clients (e.g.: Roku) do not do this automatically. Without this feature, it can be difficult to locate channels without memorizing the assigned channel number.
+
+The following registry entries configure the color and font for generated channel logo images.
+
+| Key | Type | Description | Default Value |
+| --  | --   | --          | --      | -- |
+| LogoFontFamily | REG_SZ | Font family used in logo | Segoe UI |
+| LogoColor | REG_DWORD | ARGB color value for text in logo  | 0xFFDCDCDC |
+| LogoBackground | REG_DWORD | ARGB color value for background in logo  | 0x1 |
+
+Note: The magic value 0x1 in LogoBackground means "select a dynamic background color using the channel name."
 
 ## Debug/Develop
 

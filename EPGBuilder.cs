@@ -105,10 +105,8 @@ namespace IPTVTuner
                         new XElement("lcn", channelNumber));
 
                     // Add a logo if one is available.
-                    if (!String.IsNullOrEmpty(channel.Logo))
-                    {
-                        channelNode.Add(new XElement("icon", new XAttribute("src", channel.Logo)));
-                    }
+                    var logo = String.IsNullOrEmpty(channel.Logo) ? config.ServerUrl("/logo/" + channelNumber) : channel.Logo;
+                    channelNode.Add(new XElement("icon", new XAttribute("src", logo)));
 
                     // Remember that we've seen this channel ID.
                     epgChannels.Add(channel.ID, channelNode);

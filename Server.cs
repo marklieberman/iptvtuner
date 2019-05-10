@@ -48,6 +48,7 @@ namespace IPTVTuner
 
             // Match routes that need more than exact match.
             var serveHandler = new ServeHandler(config, lineup);
+            var epgIconHandler = new EPGLogoHandler(config, lineup);
             httpServer.Use((context, next) =>
             {
                 // Handle calls to begin streaming a channel.
@@ -56,6 +57,13 @@ namespace IPTVTuner
                 if (path.StartsWith("/auto/"))
                 {
                     return serveHandler.Handle(context, next);
+                }
+
+                // Handle calls to begin streaming a channel.
+                // This is paths that begin with /auto/.
+                if (path.StartsWith("/logo/"))
+                {
+                    return epgIconHandler.Handle(context, next);
                 }
 
                 return next();
