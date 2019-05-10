@@ -153,10 +153,11 @@ namespace IPTVTuner
                     return v1Start.CompareTo(v2Start);
                 });
 
-                if (config.GapFill)
+                if (config.GapFillAmount > 0)
                 {
                     // Ensure every channel has programmes even when data is not available.
-                    FillProgrammeGaps(channel, programmes, DateTime.Today.AddDays(2));
+                    var gapFillEnd = DateTime.Today.AddHours(config.GapFillAmount);
+                    FillProgrammeGaps(channel, programmes, gapFillEnd);
                 }
 
                 // Add all of the program elements to the document.
@@ -199,7 +200,7 @@ namespace IPTVTuner
                 new XAttribute("stop", FormatXMLDate(stop)),
                 new XElement("title")
                 {
-                    Value = "No Data"
+                    Value = config.GapFillTitle
                 },
                 new XElement("desc"));
         }
