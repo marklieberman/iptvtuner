@@ -31,16 +31,16 @@ namespace IPTVTuner
 
             // Prepare a blank XML document for the EPG.
             doc = new XDocument(new XElement("tv"));
-            
-            epgChannels = new Dictionary<string,XElement>();
+            epgChannels = new Dictionary<string, XElement>();
             epgProgrammes = new Dictionary<string, List<XElement>>();
         }
 
-        private DateTime parseXMLDate (string value)
+        /**
+         * Parse a date/time string used in XMLTV guides. 
+         */
+        private DateTime ParseXMLDate (string value)
         {
-            DateTime date;
-
-            if (DateTime.TryParseExact(value, "yyyyMMddHHmmss zzz", xmltvFormat, DateTimeStyles.None, out date))
+            if (DateTime.TryParseExact(value, "yyyyMMddHHmmss zzz", xmltvFormat, DateTimeStyles.None, out DateTime date))
             {
                 return date;
             };
@@ -58,11 +58,33 @@ namespace IPTVTuner
             return DateTime.MinValue;
         }
 
-        private string formatXMLDate (DateTime date)
+        /**
+         * Format a date/time for use in XMLTV guides. 
+         */
+        private string FormatXMLDate(DateTime date)
         {
             return date
                 .ToString("yyyyMMddHHmmss zzz", xmltvFormat)
                 .Replace(":", string.Empty);
+        }
+
+        /**
+         * Round up a date/time in half hour increments.
+         */
+        private DateTime RoundUpHalfHour(DateTime value)
+        {
+            if (value.Minute < 30)
+            {
+                return value
+                    .AddMinutes(30 - value.Minute)
+                    .AddSeconds(-value.Second);
+            }
+            else
+            {
+                return value
+                    .AddMinutes(60 - value.Minute)
+                    .AddSeconds(-value.Second);
+            }
         }
 
         /**
@@ -128,15 +150,15 @@ namespace IPTVTuner
                 // Sort the existing programmes by start time.
                 programmes.Sort((v1, v2) =>
                 {
-                    var v1Start = parseXMLDate(v1.Attribute("start").Value);
-                    var v2Start = parseXMLDate(v2.Attribute("start").Value);
+                    var v1Start = ParseXMLDate(v1.Attribute("start").Value);
+                    var v2Start = ParseXMLDate(v2.Attribute("start").Value);
                     return v1Start.CompareTo(v2Start);
                 });
 
                 if (config.GapFill)
                 {
                     // Ensure every channel has programmes even when data is not available.
-                    fillProgrammeGaps(channel, programmes, DateTime.Today.AddDays(2));
+                    FillProgrammeGaps(channel, programmes, DateTime.Today.AddDays(2));
                 }
 
                 // Add all of the program elements to the document.
@@ -147,64 +169,58 @@ namespace IPTVTuner
             }
         }
 
-        private DateTime roundUpHalfHour (DateTime value)
-        {
-            if (value.Minute < 30)
-            {
-                return value
-                    .AddMinutes(30 - value.Minute)
-                    .AddSeconds(-value.Second);
-            }
-            else
-            {
-                return value
-                    .AddMinutes(60 - value.Minute)
-                    .AddSeconds(-value.Second);
-            }
-        }
-
-        private DateTime getLastProgrammeStop (List<XElement> programmes)
+        /**
+         * Get the stop time for the last program in a list.
+         * Requires the programmes to be sorted.
+         * Returns the current time rounded down to the neareast hour if there are no programmes.
+         */
+        private DateTime GetLastProgrammeStop(List<XElement> programmes)
         {
             if (programmes.Count > 0)
             {
                 var lastElement = programmes[programmes.Count - 1];
-                return parseXMLDate(lastElement.Attribute("stop").Value);
+                return ParseXMLDate(lastElement.Attribute("stop").Value);
             }
             else
             {
                 var now = DateTime.Now;
                 return now
-                    .AddHours(-1)
                     .AddMinutes(-now.Minute)                    
                     .AddSeconds(-now.Second);
             }
         }
 
-        private XElement getNoDataProgramme(string channelId, DateTime start, DateTime stop)
+        /**
+         * Get a placeholder programme element.
+         */
+        private XElement GetNoDataProgramme(string channelId, DateTime start, DateTime stop)
         {
             return new XElement("programme",
                 new XAttribute("channel", channelId),
-                new XAttribute("start", formatXMLDate(start)),
-                new XAttribute("stop", formatXMLDate(stop)),
+                new XAttribute("start", FormatXMLDate(start)),
+                new XAttribute("stop", FormatXMLDate(stop)),
                 new XElement("title")
                 {
-                    Value = "Missing Data"
+                    Value = "No Data"
                 },
                 new XElement("desc"));
         }
 
-        private void fillProgrammeGaps (String channel, List<XElement> programmes, DateTime end)
+        /**
+         * Fill gaps in the programme data for a channel.
+         */
+        private void FillProgrammeGaps (String channel, List<XElement> programmes, DateTime end)
         {
             // TODO Fill gaps between episodes.
 
             // Prepare initial values for the fill operation.
-            var start = getLastProgrammeStop(programmes);
-            var stop = roundUpHalfHour(start);
+            var start = GetLastProgrammeStop(programmes);
+            var stop = RoundUpHalfHour(start);
             
             // Fill the remaining time until the end date.
-            while (stop < end)
+            while (stop <= end)
             {
-                programmes.Add(getNoDataProgramme(channel, start, stop));
+                programmes.Add(GetNoDataProgramme(channel, start, stop));
 
                 // Next time slice.
                 start = stop;

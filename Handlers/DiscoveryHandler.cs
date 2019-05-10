@@ -6,7 +6,7 @@ namespace IPTVTuner.Handlers
 {
     class DiscoverHandler : MyHandler, IHttpRequestHandler
     {
-        private Config config;
+        private readonly Config config;
 
         public DiscoverHandler(Config config)
         {
