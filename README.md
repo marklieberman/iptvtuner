@@ -52,7 +52,7 @@ Settings for IPTVTuner are stored in the Windows Registry under HKLM\Software\IP
 | EPGURL | REG_SZ | URL of the EPG from your provider. | **Required** |
 | Filter | REG_SZ | Regular expression to include channels. | **Required** |
 | IpAddress | REG_SZ | IP address on which to listen. | 127.0.0.1 |
-| Port | REG_SZ | Port number on which to listen. | 6079 |
+| Port | REG_DWORD | Port number on which to listen. | 6079 |
 | StartChannel | REG_DWORD | Starting channel number for IPTV lineup. | 1 |
 
 ### Additional Registry Settings
