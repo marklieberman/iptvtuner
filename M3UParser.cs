@@ -19,10 +19,10 @@ namespace IPTVTuner
         public M3UParser()
         {
             // TODO Support custom attribute names in configuration.
-            idRegex = new Regex("tvg-id=\"([^\"]+)\"");
-            nameRegex = new Regex("tvg-name=\"([^\"]+)\"");
-            logoRegex = new Regex("tvg-logo=\"([^\"]+)\"");
-            groupRegex = new Regex("group-title=\"([^\"]+)\"");
+            idRegex = new Regex("tvg-id=\"([^\"]+)\"", RegexOptions.IgnoreCase);
+            nameRegex = new Regex("tvg-name=\"([^\"]+)\"", RegexOptions.IgnoreCase);
+            logoRegex = new Regex("tvg-logo=\"([^\"]+)\"", RegexOptions.IgnoreCase);
+            groupRegex = new Regex("group-title=\"([^\"]+)\"", RegexOptions.IgnoreCase);
         }
 
         /**
